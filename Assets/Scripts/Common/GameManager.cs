@@ -8,6 +8,7 @@ public class GameManager : Singleton<GameManager>
 {
     public enum eGameState
     { 
+        Title,
         GameStart,
         LevelStart,
         Game,
@@ -75,6 +76,9 @@ public class GameManager : Singleton<GameManager>
             gameState = value;
             switch (gameState)
             {
+                case eGameState.Title:
+                    stateEvent = Title;
+                    break;
                 case eGameState.GameStart:
                     stateEvent = GameStart;
                     break;
@@ -114,7 +118,7 @@ public class GameManager : Singleton<GameManager>
     void Start()
     {
         gameOverPanel.SetActive(false);
-        GameState = eGameState.LevelStart;
+        GameState = eGameState.Title;
         Lives = startingLives;
     }
 
@@ -129,9 +133,24 @@ public class GameManager : Singleton<GameManager>
         stateEvent?.Invoke();
     }
 
+    private void Title()
+    {
+        livesText.enabled = false;
+        scoreText.enabled = false;
+        timeText.enabled = false;
+        if (SceneManager.GetActiveScene().name != "Title")
+            SceneManager.LoadSceneAsync("Title");
+    }
+
     private void GameStart()
     {
+        livesText.enabled = true;
+        scoreText.enabled = true;
+        timeText.enabled = true;
         gameEnded = false;
+        if (SceneManager.GetActiveScene().name != "Waterfall")
+            SceneManager.LoadSceneAsync("Waterfall");
+
         GameState = eGameState.LevelStart;
     }
 
@@ -172,7 +191,7 @@ public class GameManager : Singleton<GameManager>
             if (Lives <= 0)
                 GameState = eGameState.GameOver;
             else
-                GameState = eGameState.LevelStart;
+                GameState = eGameState.Title;
         }
     }
 
@@ -191,6 +210,10 @@ public class GameManager : Singleton<GameManager>
         print("You win");
 
         backgroundMus.Stop();
+
+        livesText.enabled = false;
+        scoreText.enabled = false;
+        timeText.enabled = false;
 
         if (SceneManager.GetActiveScene().name != "Win")
             SceneManager.LoadSceneAsync("Win");
